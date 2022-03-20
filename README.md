@@ -3,7 +3,9 @@ Minecraft control panel capable to spawn & control an army of bot
 
 ## Project structure
 Core - Control panel for the bot
+
 Web - UI for control panel
+
 Worker - Mineflayer bot which listens to control panel
 
 ## Prerequisite
