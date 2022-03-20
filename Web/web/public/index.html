@@ -1,0 +1,44 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to MinecraftBotHelper</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <iframe src="http://localhost:3001/" style="width: 95vw;height:80vh;"></iframe>
+    <input type="text" id="message" name="message"/>
+    <button type="button" onclick="sendChat()">Send</button>
+    <script>
+        function sendChat() {
+                const xhttp = new XMLHttpRequest();
+                let message = document.getElementById("message").value;
+                xhttp.open("POST", "/botChat", true);
+                xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xhttp.send(JSON.stringify({'message':message}));
+                xhttp.onload = function() {
+                    document.getElementById("message").value = "";
+                }
+            }
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Control Panel | Minecraft Bot Slave</title>
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+    <script src="/index.js" type="text/javascript"></script>
+</body>
+
+</html>
