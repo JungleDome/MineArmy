@@ -15,7 +15,12 @@ const PUBLICFOLDER = path.join(__dirname, '../public')
 // App
 const app = express();
 const server = require('http').createServer(app)
-const io = new SocketIOServer(server)
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+})
 
 // Serve static page
 app.use(compression())

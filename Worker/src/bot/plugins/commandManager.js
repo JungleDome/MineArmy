@@ -1,4 +1,4 @@
-const EventEmitter = require('events');
+const EventEmitter = require('events')
 
 /**
  *
@@ -6,77 +6,75 @@ const EventEmitter = require('events');
  * @param {import("../../index.js").Bot} bot
  */
 var CommandManager = (bot) => {
-    console.log("Command manager loaded");
- 
-    bindEvents(bot);
-    registerWrapper();
-    registerEvent();
-    registerBasic();
+    //Plugin information
+    const PLUGIN_DISPLAY_NAME = "Command Manager"
+    const PLUGIN_NAME = "commandManager"
+    const PLUGIN_PRIORITY = Enum.PLUGIN_PRIORITY.CRITICAL
+    let isPluginLoaded = false
 
-    async function reloadCommand() {
-        bot.logger.info("Reloading essential plugin...");
-        delete require.cache[require.resolve("./essential.js")];
+    function loadPlugins() {
+        //Register your plugins & it's imports here
+        let pluginPath = [
+            "./essential.js",
+            "./login.js",
+            "./farmer.js",
+            "./shopper.js",
+            "./serverHelper.js",
+            "./afkSeller.js",
+            "./obsolete_miner.js",
+            "./obsolete_builder.js",
+            "../../lib/builder/index.js",
+            "./mineflayer-util.js",
+        ]
+
+        if (isPluginLoaded) {
+            bot.logger.info("---------------Removing old plugins-------------")
+            pluginPath.forEach(x => {
+                delete require.cache[require.resolve(x)]
+            })
+        }
         
-        bot.eventNames().forEach(function (eventName) {
-            if (eventName.startsWith("helper_workaround_"))
-                bot.removeAllListeners(eventName);
+        bot.logger.info("---------------Loading plugins-------------")
+        pluginPath.forEach(x => {
+            bot.loadPlugins(require(x))
         })
-        bot.removeAllListeners("helper_webserver_message");
-        await bot.eventManager.clearRegisteredEvent();
+        bot.logger.info("---------------Plugins loaded-------------")
 
-        bindEvents(bot);
-
-        bot.logger.info("Plugin reloaded");
-    }
-
-    function bindEvents(bot) {
-        bot.logger.info("Loading essential plugin...");
-        bot.loadPlugins([
-            require("./essential.js"),
-        ]);
-        bot.logger.info("Essential plugin loaded");
+        isPluginLoaded = true
     }
 
 
     function registerEvent() {
-        bot.on('helper.reload', async function (message) {
-            await reloadCommand();
-        });
+        bot.on('core.server.receiveCommand', function (message) {
+            if (message && Util.stripTextFormat(message.toString())) {
+                var serverCommand = Util.stripTextFormat(message.toString())
+                bot.logger.info(serverCommand, PLUGIN_DISPLAY_NAME)
+                bot.emit('core.command', serverCommand, bot.core.config.masterPlayerName)
+            }
+        })
+
+        bot.on('core.reload', async function (message) {
+            loadPlugins()
+            bot.logger.info("Plugins reloaded.", PLUGIN_DISPLAY_NAME)
+        })
+
+        bot.on('core.command', function (message) {
+            if (message == "reload") {
+                bot.emit('core.reload')
+            }
+        })
     }
 
-    function registerWrapper() {
-        //wrapper bypass for reloading remove listener issue
-        bot.on('diggingCompleted', function (block) {
-            bot.emit('helper_workaround_diggingCompleted', block);
-        });
+    registerEvent()
+    loadPlugins()
+    bot.logger.info("Loaded", PLUGIN_DISPLAY_NAME)
 
-        bot.on('webserver_message', function (message) {
-            bot.emit('helper_webserver_message', message);
-        });
-    }
-
-    function registerBasic() {
-        bot.on('error', (err) => {
-            bot.logger.info(err);
-            bot.logger.info("error");
-            bot.emit("helper.rejoin");
-        });
-
-        bot.on('login', function () {
-            bot.logger.info("[JOINED]");
-        });
-
-        bot.on('death', function () {
-            bot.logger.info("[DEAD]");
-            bot.chat('/is go');
-        });
-
-        bot.on('kicked', function (reason) {
-            bot.logger.info("[KICKED]:", reason);
-            if (reason.text == "[Proxy] Proxy restarting.")
-                bot.emit("helper.rejoin");
-        });
+    //Expose plugin information
+    return {
+        name: PLUGIN_NAME,
+        displayName: PLUGIN_DISPLAY_NAME,
+        priority: PLUGIN_PRIORITY,
     }
 }
 
-module.exports = CommandManager;
+module.exports = CommandManager

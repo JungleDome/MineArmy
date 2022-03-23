@@ -1,6 +1,6 @@
-const Util = require("./mineflayer-util.js");
+const Util = require("./mineflayer-util.js")
 const { Movements, goals: { GoalNear, GoalNearXZ } } = require('mineflayer-pathfinder')
-const Vec3 = require("Vec3");
+const Vec3 = require("Vec3")
 
 /**
  *
@@ -9,165 +9,80 @@ const Vec3 = require("Vec3");
  * @param {*} options
  */
 var ServerHelper = (bot, options) => {
-    bot.logger.info("Server helper loaded");
 
-    
+    //Plugin information
+    const PLUGIN_DISPLAY_NAME = "Server Helper"
+    const PLUGIN_NAME = "serverHelper"
+    const COMMAND = {
+        Ping: "/ping"
+    }
+    const PLUGIN_PRIORITY = Enum.PLUGIN_PRIORITY.CRITICAL
+
+
     let commandEvent = {
-        "helper.serverHelper.ping": async () => {
+        "serverHelper.ping": async () => {
             bot.eventManager.registerEventOnce("message", () => {
-                bot.eventManager.triggerEvent("helper.serverHelper.pingDone");
-            });
-            bot.chat("/ping");
+                bot.eventManager.triggerEvent("serverHelper.pingDone")
+            })
+            bot.chat(COMMAND.Ping)
         },
-        "helper.serverHelper.coop": async (username) => {
-            bot.eventManager.registerEventOnce("message", () => {
-                bot.eventManager.triggerEvent("helper.serverHelper.coopDone");
-            });
-            bot.chat("/is coop " + username);
+        "serverHelper.walkAround": async () => {
+            bot.setControlState("forward", true)
+            await Util.wait("1000")
+            bot.setControlState("forward", false)
+            await Util.wait("300")
+            bot.setControlState("back", true)
+            await Util.wait("1000")
+            bot.setControlState("back", false)
+            bot.eventManager.triggerEvent("serverHelper.walkAroundDone")
         },
-        "helper.serverHelper.alert": async () => {
-            let lastKnownPlayerList = {
-                hub: [],
-                skyblock: [],
-                classic: [],
-                towny: [],
-                vanilla: [],
-                bedwars: []
-            }
-            bot.eventManager.registerEvent("strippedMessage", (message) => {
-                if (message.startsWith("[hub]")) {
-                    let players = message.substring(message.indexOf(":") + 1).trim().split(', ');
-                    let a = lastKnownPlayerList.hub.filter(x => !players.includes(x));
-                    lastKnownPlayerList.hub = players;
-                }
-            });
-        },
-        "helper.serverHelper.walkAround": async (username) => {
-            bot.setControlState("forward", true);
-            await Util.wait("1000");
-            bot.setControlState("forward", false);
-            await Util.wait("300");
-            bot.setControlState("back", true);
-            await Util.wait("1000");
-            bot.setControlState("back", false);
-        },
-        "helper.serverHelper.dropAll": async () => {
-            bot.inventory.items().forEach(async item => await bot.tossStack(item))
-        },
-        "helper.serverHelper.selectServer": async (itemName) => {
-            try {
-                bot.currentWindow ? bot.closeWindow(bot.currentWindow) : null;
-                await Util.wait(300);
-                bot.activateItem();
-                bot.logger.info("Opened server selector");
-                bot.eventManager.registerEventOnce("windowOpen", async function (window) {
-                    try {
-                        function navigateNestedWindow(item) {
-                            return new Promise((resolve, reject) => {
-                                try {
-                                    let _item = item;
-                                    let slot;
-                                    let clickMode = 0;
-                                    let clickButton = 0;
-                                    if (typeof (item) === "object") {
-                                        _item = item.id;
-                                        clickMode = item.clickMode ?? 0;
-                                        clickButton = item.clickButton ?? 0;
-                                    }
-                                    if (_item) {
-                                        let windowItem = bot.currentWindow.findContainerItem(_item)
-                                        if (windowItem == null) {
-                                            reject("Helper unable to find this item. " + _item);
-                                            return;
-                                        }
-                                        //bot.logger.info(windowItem);
-                                        slot = windowItem.slot;
-                                    } else {
-                                        slot = item.slot;
-                                    }
-                                    bot.logger.debug("Slot:" + slot + ", btn:" + clickButton + ", mode:" + clickMode);
-                                    bot.clickWindow(slot, clickButton, clickMode, () => {
-                                        bot.eventManager.registerEventOnce("windowOpen", function () { resolve() });
-                                    });
-                                    setTimeout(function () {
-                                        reject("Timeout waiting");
-                                    }, 3000);
-                                } catch (error) {
-                                    reject(error);
-                                }
-                            });
-                        }
-                        if (itemName) {
-                            var items = [];
-                            var shopItem = bot.mcData.itemsByName[itemName].id;
-                            items.push({ id: shopItem, clickMode: 0, clickButton: 1 });
-                            bot.logger.info(items);
-                            for (const item of items) {
-                                await Util.retryOperation(navigateNestedWindow, 3000, 3, item);
-                            }
-                            bot.logger.info("Done selling");
-                            bot.eventManager.triggerEvent("helper.serverHelper.selectServerDone");
-                        }
-                        bot.currentWindow ? bot.closeWindow(bot.currentWindow) : null;
-                    } catch (err) {
-                        bot.logger.error(err);
-                    }
-                });
-            } catch (err) {
-                bot.logger.error(err);
-            }
-        },
-        "helper.serverHelper.goToPlayer": async (player) => {
-            const target = bot.players[player]?.entity
+        "serverHelper.goToPlayer": async (playerName) => {
+            const target = bot.players[playerName]?.entity
             if (!target) {
-                bot.logger.error("I don't see you !")
+                bot.logger.error("I don't see you !", PLUGIN_DISPLAY_NAME)
                 return
             }
             const { x: playerX, y: playerY, z: playerZ } = target.position
-            
+
             bot.pathfinder.setGoal(new GoalNear(playerX, playerY, playerZ, 1))
-            bot.eventManager.triggerEvent("helper.serverHelper.goToPlayer");
+            bot.eventManager.triggerEvent("serverHelper.goToPlayerDone")
         },
     }
-    
+
     function registerEvent() {
         for (const [event, func] of Object.entries(commandEvent)) {
-            bot.eventManager.registerEvent(event, func);
+            bot.eventManager.registerEvent(event, func)
         }
 
-        bot.eventManager.registerEvent('helper.command', function (command, commandName) {
-            if (command != "") {
-                if (command == 'helper ping') {
-                    bot.eventManager.registerEventOnce("helper.serverHelper.pingDone", () => {
-                        bot.logger.info("Pong");
-                    });
-                    bot.eventManager.triggerEvent("helper.serverHelper.ping");
-                } else if (command.startsWith('helper coop ')) {
-                    bot.eventManager.triggerEvent("helper.serverHelper.coop", command.replace('helper coop ',''));
-                    bot.eventManager.registerEventOnce("helper.serverHelper.coopDone", () => {
-                        bot.logger.info("Coop done");
-                    });
-                } else if (command == 'helper alert') {
-                    bot.chat('/glist all');
-                    bot.eventManager.triggerEvent("helper.serverHelper.alert");
-                } else if (command == 'helper walkAround') {
-                    bot.eventManager.triggerEvent("helper.serverHelper.walkAround");
-                } else if (command == 'helper dropAll') {
-                    bot.eventManager.triggerEvent("helper.serverHelper.dropAll");
-                } else if (command.startsWith('helper select')) {
-                    bot.eventManager.triggerEvent("helper.serverHelper.selectServer", command.replace('helper select ', ''));
-                } else if (command.startsWith('helper goTo')) {
-                    bot.eventManager.triggerEvent("helper.serverHelper.goToPlayer", command.replace('helper goTo ', ''));
-                }
+        bot.eventManager.registerEvent('core.command', function (command, commandName) {
+            if (command == 'helper ping') {
+                bot.eventManager.triggerEvent("serverHelper.ping")
+                bot.eventManager.registerEventOnce("serverHelper.pingDone", () => {
+                    bot.logger.info("Pong", PLUGIN_DISPLAY_NAME)
+                })
+            } else if (command == 'helper walkAround') {
+                bot.eventManager.triggerEvent("serverHelper.walkAround")
+                bot.eventManager.registerEventOnce("serverHelper.walkAroundDone", () => {
+                    bot.logger.info("Walk around done", PLUGIN_DISPLAY_NAME)
+                })
+            } else if (command.startsWith('helper goto ')) {
+                bot.eventManager.triggerEvent("serverHelper.goToPlayer", command.replace('helper goto ', ''))
+                bot.eventManager.registerEventOnce("serverHelper.goToPlayerDone", () => {
+                    bot.logger.info("Reached player", PLUGIN_DISPLAY_NAME)
+                })
             }
-        });
+        })
     }
 
-    function posInChunk(pos) {
-        return new Vec3(Math.floor(pos.x / 16), Math.floor(pos.y), Math.floor(pos.z / 16))
-    }
+    registerEvent()
+    bot.logger.info("Loaded", PLUGIN_DISPLAY_NAME)
 
-    registerEvent();
+    //Expose plugin information
+    return {
+        name: PLUGIN_NAME,
+        displayName: PLUGIN_DISPLAY_NAME,
+        priority: PLUGIN_PRIORITY,
+    }
 }
 
-module.exports = ServerHelper;
+module.exports = ServerHelper

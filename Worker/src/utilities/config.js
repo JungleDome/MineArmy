@@ -20,5 +20,7 @@ const masterPlayerName = "Ethanord2lm";
 module.exports = {
     server: serverList[0],
     bots: botList,
-    masterPlayerName: masterPlayerName
+    masterPlayerName: masterPlayerName,
+    coreServerIp: 'http://localhost',
+    coreServerPort: 3000
 }

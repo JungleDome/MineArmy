@@ -1,8 +1,14 @@
 let events = [
     {
         name: 'bot.create',
-        fnHandler: () => {
-
+        fnHandler: (socket, ip, port, username, password, offlinePassword) => {
+            socket.to("worker").emit('bot.create', {
+                serverIP: ip,
+                serverPort: port ? port : 25565,
+                username: username,
+                password: password,
+                offlinePassword: offlinePassword
+            })
         }
     }, {
         name: 'test',
@@ -14,5 +20,5 @@ let events = [
 
 
 module.exports = {
-    events: this.events
+    events: events
 }

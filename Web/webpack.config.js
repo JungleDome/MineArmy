@@ -1,6 +1,7 @@
 const env = process.env.NODE_ENV;
 const { VueLoaderPlugin } = require("vue-loader");
 const path = require("path");
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 
 module.exports = {
     mode: env == 'production' || env == 'none' ? env : 'development',
@@ -43,10 +44,18 @@ module.exports = {
         ],
     },
     plugins: [
+        new NodePolyfillPlugin(),
         new VueLoaderPlugin(),
     ],
     resolve: {
         extensions: ["*", ".js", ".vue", ".json"],
+        fallback: {
+            'fs': false,
+            'tls': false,
+            'bufferutil': false,
+            'utf-8-validate': false,
+            'net': false
+        }
     },
     devServer: {
         historyApiFallback: true,

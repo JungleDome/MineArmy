@@ -2,6 +2,9 @@ const MineflayerViewer = require('prismarine-viewer');
 // const MineflayerViewer = require('./viewer');
 
 let CreateViewer = function (bot, serverPort) {
+    if (!bot)
+        throw "No bot instance specified"
+    
     bot.once('spawn', function () {
         MineflayerViewer.mineflayer(bot, {port: serverPort})
     })

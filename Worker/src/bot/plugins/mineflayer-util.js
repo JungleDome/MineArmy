@@ -1,32 +1,4 @@
-const { Vec3 } = require('vec3');
-
-function getViewDirection(pitch, yaw) {
-    const csPitch = Math.cos(pitch)
-    const snPitch = Math.sin(pitch)
-    const csYaw = Math.cos(yaw)
-    const snYaw = Math.sin(yaw)
-    return new Vec3(-snYaw * csPitch, snPitch, -csYaw * csPitch)
-}
-
-let checkPlayerLookingAt = function (bot, playerName) {
-    try {
-        let block;
-        Object.values(bot.entities).forEach(entity => {
-            if (entity.type == 'player' && entity.username == playerName) {
-                const maxDistance = 256;
-                const eyePosition = entity.position.offset(0, entity.height, 0);
-                const viewDirection = getViewDirection(entity.pitch, entity.yaw);
-                block = bot.world.raycast(eyePosition, viewDirection, maxDistance, (i) => i.name != "air");
-                return;
-            }
-        });
-        return block;
-    } catch (err) {
-        bot.logger.info(err);
-    }
-
-    return;
-}
+const { Vec3 } = require('vec3')
 
 module.exports = {
     /**
@@ -36,19 +8,17 @@ module.exports = {
      * @returns {String} Stripped text
      */
     stripTextFormat: (text) => {
-        return text.replace(/§./g, "");
+        return text.replace(/§./g, "")
     },
 
 
     /**
-     *
-     *
      * @param {String} text1
      * @param {String} text2
      * @returns {Boolean} 
      */
     compareIgnoreCase: (text1, text2) => {
-        return text1.toUpperCase() === text2.toUpperCase();
+        return text1.toUpperCase() === text2.toUpperCase()
     },
 
     wait: ms => new Promise(r => setTimeout(r, ms)),
@@ -61,34 +31,11 @@ module.exports = {
                     return module.exports.wait(delay)
                         .then(module.exports.retryOperation.bind(null, operation, delay, retries - 1, ...context))
                         .then(resolve)
-                        .catch(reject);
+                        .catch(reject)
                 }
-                return reject(reason);
-            });
+                return reject(reason)
+            })
     }),
-
-
-
-    raycastLookAtBlock: (entity) => {
-        function getViewDirection(pitch, yaw) {
-            const csPitch = Math.cos(pitch)
-            const snPitch = Math.sin(pitch)
-            const csYaw = Math.cos(yaw)
-            const snYaw = Math.sin(yaw)
-            return new Vec3(-snYaw * csPitch, snPitch, -csYaw * csPitch)
-        }
-
-        function checkPlayerLookingAt(entity) {
-            let block;
-            const maxDistance = 256;
-            const eyePosition = entity.position.offset(0, entity.height, 0);
-            const viewDirection = getViewDirection(entity.pitch, entity.yaw);
-            block = bot.world.raycast(eyePosition, viewDirection, maxDistance, (i) => i.name != "air");
-            return block;
-        }
-
-        return checkPlayerLookingAt(entity);
-    },
 
     /**
      *
@@ -96,14 +43,28 @@ module.exports = {
      * @param {import('../..').Bot} bot
      * @param {string} eventName
      * @param {number} [timeout=3000]
-     * @returns
+     * @returns Event promise
      */
     awaitEvent: (bot, eventName, timeout = 3000) => {
         return new Promise((resolve, reject) => {
-            bot.eventManager.registerEventOnce(eventName, () => { resolve() });
-            setTimeout(() => { reject("Timeout") }, timeout);
+            bot.eventManager.registerEventOnce(eventName, () => { resolve() })
+            setTimeout(() => { reject("Timeout") }, timeout)
         })
     },
 
-    checkPlayerLookingAt: checkPlayerLookingAt,
+    /**
+     * @param {number} milliseconds
+     * @returns Formatted time string
+     */
+    getDurationDisplayString: (milliseconds) => {
+        var msec = milliseconds
+        var hh = Math.floor(msec / 1000 / 60 / 60)
+        msec -= hh * 1000 * 60 * 60
+        var mm = Math.floor(msec / 1000 / 60)
+        msec -= mm * 1000 * 60
+        var ss = Math.floor(msec / 1000)
+        msec -= ss * 1000
+
+        return (hh + ":" + mm + ":" + ss)
+    }
 }

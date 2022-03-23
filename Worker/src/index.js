@@ -1,14 +1,13 @@
-const WebServer = require('./webServer.js');
-const Bot = require('./bot/bot.js');
-const BotViewer = require('./bot/botViewer');
+const WorkerServer = require('./workerServer.js');
 const Process = require('process');
+const Config = require('./utilities/config.js')
 
 //// For minecraft client proxy
 // Bot.CreateProxyBot({host: 'play.fallenskymc.com', port: 25565, version: '1.17.1'});
 
 // For web server control bot
 //var bots = Bot.CreateBots();
-WebServer.StartServer(3000);
+WorkerServer.CreateConnection(`${Config.coreServerIp}:${Config.coreServerPort}`);
 
 // let viewerPort = 3001;
 // bots.forEach(function (bot) {
