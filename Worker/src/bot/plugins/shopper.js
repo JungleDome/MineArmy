@@ -1,4 +1,5 @@
 const Util = require("./mineflayer-util.js")
+const Enum = require("../enum.js")
 /**
  *
  *
@@ -106,7 +107,7 @@ var Shopper = (bot, options) => {
     }
 
     registerEvent()
-    bot.logger.info("Loaded", pluginDisplayName)
+    bot.logger.info("Loaded", PLUGIN_DISPLAY_NAME)
 
     //Expose plugin information
     return {

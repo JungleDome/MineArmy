@@ -1,5 +1,6 @@
 const env = process.env.NODE_ENV;
 const { VueLoaderPlugin } = require("vue-loader");
+const { VuetifyLoaderPlugin } = require('vuetify-loader')
 const path = require("path");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 
@@ -45,6 +46,7 @@ module.exports = {
     },
     plugins: [
         new NodePolyfillPlugin(),
+        new VuetifyLoaderPlugin(),
         new VueLoaderPlugin(),
     ],
     resolve: {

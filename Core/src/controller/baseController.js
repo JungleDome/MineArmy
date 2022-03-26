@@ -3,7 +3,7 @@ let registeredController = [
     require('./controlPanelController')
 ]
 
-let baseControllerEvent = function (socketContext) {
+let registerBaseControllerEvent = function (socketContext) {
     socketContext.on('join', (roomName) => {
         socketContext.join(roomName)
     })
@@ -11,19 +11,27 @@ let baseControllerEvent = function (socketContext) {
 
 let registerSocketEvent = function (socketContext, events) {
     events.forEach(x => {
-        socketContext.on(x.name, x.fnHandler)
+        socketContext.on(x.name, x.fnHandler, socketContext)
     })
 }
 
 let registerAllControllerEvent = function (socketContext) {
-    baseControllerEvent(socketContext)
+    registerBaseControllerEvent(socketContext)
     registeredController.forEach(x => {
-        registerSocketEvent(socketContext, x.events)
+        registerSocketEvent(socketContext, x(socketContext).events)
+    })
+}
+
+let registerSubControllerEvent = function (socketContext) {
+    registeredController.forEach(x => {
+        registerSocketEvent(socketContext, x(socketContext).events)
     })
 }
 
 
 module.exports = {
     registerAllControllerEvent: registerAllControllerEvent,
-    registerSocketEvent: registerSocketEvent
+    registerSocketEvent: registerSocketEvent,
+    registerBaseControllerEvent: registerBaseControllerEvent,
+    registerSubControllerEvent: registerSubControllerEvent,
 }

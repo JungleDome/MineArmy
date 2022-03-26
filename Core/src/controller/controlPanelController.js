@@ -1,4 +1,5 @@
 let history = []
+var socketContext
 
 let events = [
     {
@@ -31,6 +32,9 @@ let events = [
 ]
 
 
-module.exports = {
-    events: events
+module.exports = (_socketContext) => {
+    socketContext = _socketContext
+    return {
+        events: events
+    }
 }

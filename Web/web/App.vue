@@ -1,6 +1,6 @@
 <template>
-  <v-card class="mx-auto">
-    <v-layout>
+  <v-app>
+    <v-layout >
       <v-app-bar color="primary">
         <template v-slot:prepend>
           <v-app-bar-nav-icon
@@ -8,7 +8,7 @@
           ></v-app-bar-nav-icon>
         </template>
 
-        <v-app-bar-title>Minecraft Slave Control Panel</v-app-bar-title>
+        <v-app-bar-title>MineArmy Control Panel</v-app-bar-title>
       </v-app-bar>
       <v-navigation-drawer v-model="drawer" temporary>
         <v-list density="compact" nav>
@@ -31,7 +31,7 @@
         <router-view />
       </v-main>
     </v-layout>
-  </v-card>
+  </v-app>
 </template>
 
 <script>
@@ -39,8 +39,9 @@ export default {
   data: () => ({
     drawer: false,
   }),
-  mount() {
-    this.$store.commit('createSocket')
-  }
+  mounted() {
+    console.log("mount - socket");
+    this.$store.commit("createSocket");
+  },
 };
 </script>

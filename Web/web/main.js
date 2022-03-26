@@ -13,6 +13,13 @@ import store from './components/store.js'
 const vuetify = createVuetify({
     components,
     directives,
+    theme: {
+        variations: {
+            colors: ['primary', 'secondary'],
+            lighten: 2,
+            darken: 2,
+        },
+    }
 })
 
 // new Vue({

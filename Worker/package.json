@@ -1,7 +1,7 @@
 {
-  "name": "MinecraftBotHelper",
+  "name": "minearmyworker",
   "version": "1.0.0",
-  "description": "Minecraft Bot Helper",
+  "description": "MineArmy Worker Bot",
   "author": "JungleDome",
   "scripts": {
     "server": "node src/index.js",
@@ -16,7 +16,7 @@
     "prismarine-schematic": "^1.2.2",
     "prismarine-viewer": "^1.20.0",
     "simple-node-logger": "^21.8.12",
-    "socket.io": "^4.4.1",
+    "socket.io-client": "^4.4.1",
     "uuid": "^8.3.2"
   },
   "license": "MIT"

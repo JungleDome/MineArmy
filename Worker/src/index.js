@@ -7,8 +7,8 @@ const Config = require('./utilities/config.js')
 
 // For web server control bot
 //var bots = Bot.CreateBots();
-WorkerServer.CreateConnection(`${Config.coreServerIp}:${Config.coreServerPort}`);
-
+WorkerServer.CreateConnection(`${Config.coreServerIp}:${Config.coreServerPort}/`);
+var done = (function wait() { if (!done) setTimeout(wait, 1000) })();
 // let viewerPort = 3001;
 // bots.forEach(function (bot) {
 //     BotViewer.CreateViewer(bot, viewerPort);

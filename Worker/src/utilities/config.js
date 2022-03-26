@@ -22,5 +22,5 @@ module.exports = {
     bots: botList,
     masterPlayerName: masterPlayerName,
     coreServerIp: 'http://localhost',
-    coreServerPort: 3000
+    coreServerPort: 8080
 }

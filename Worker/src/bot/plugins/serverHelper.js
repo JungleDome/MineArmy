@@ -1,6 +1,7 @@
 const Util = require("./mineflayer-util.js")
 const { Movements, goals: { GoalNear, GoalNearXZ } } = require('mineflayer-pathfinder')
 const Vec3 = require("Vec3")
+const Enum = require("../enum.js")
 
 /**
  *

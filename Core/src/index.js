@@ -31,13 +31,22 @@ app.get('/test', (req, res) => {
 });
 
 // Start server
+
 server.listen(PORT, null, () => {
   console.log(`Running on *:${PORT}`);
 
   //Inject event
   io.on('connection', (socket) => {
-    console.log('a user connected');
-    baseController.registerAllControllerEvent(socket)
+    baseController.registerBaseControllerEvent(socket)
   });
 
+  io.of('/').adapter.on('join-room', (room, id) => {
+    let socket = io.sockets.sockets.get(id);
+    if (room == 'controlPanel') {
+      console.log('An admin connected');
+      baseController.registerSubControllerEvent(socket)
+    } else if (room == 'worker') {
+      console.log('A worker connected');
+    }
+  })
 });

@@ -16,7 +16,9 @@ const store = createStore({
             "Access-Control-Allow-Origin": "*"
           }
         })
-        state.socket.emit('join', 'controlPanel')
+        state.socket.on('connect', () => {
+          state.socket.emit('join', 'controlPanel')
+        })
       }
     }
   }

@@ -1,4 +1,5 @@
 const EventEmitter = require('events')
+const Enum = require("../enum.js")
 
 /**
  *
@@ -15,16 +16,13 @@ var CommandManager = (bot) => {
     function loadPlugins() {
         //Register your plugins & it's imports here
         let pluginPath = [
-            "./essential.js",
-            "./login.js",
-            "./farmer.js",
-            "./shopper.js",
-            "./serverHelper.js",
-            "./afkSeller.js",
-            "./obsolete_miner.js",
-            "./obsolete_builder.js",
-            "../../lib/builder/index.js",
-            "./mineflayer-util.js",
+            // "./essential.js",
+            // "./login.js",
+            // "./farmer.js",
+            // "./shopper.js",
+            // "./serverHelper.js",
+            // "./afkSeller.js",
+            // "./mineflayer-util.js",
         ]
 
         if (isPluginLoaded) {
@@ -36,7 +34,7 @@ var CommandManager = (bot) => {
         
         bot.logger.info("---------------Loading plugins-------------")
         pluginPath.forEach(x => {
-            bot.loadPlugins(require(x))
+            bot.loadPlugin(require(x))
         })
         bot.logger.info("---------------Plugins loaded-------------")
 

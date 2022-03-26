@@ -1,4 +1,5 @@
 const Util = require("./mineflayer-util.js")
+const Enum = require("../enum.js")
 
 /**
  *

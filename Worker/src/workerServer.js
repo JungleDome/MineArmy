@@ -1,4 +1,4 @@
-const socketio = require("socket.io")
+const socketio = require("socket.io-client").io
 const Bot = require('./bot/bot.js')
 const BotViewer = require('./bot/botViewer')
 
@@ -14,24 +14,38 @@ function getEmptyViewerPort() {
     return lastPort ? lastPort + 1 : defaultViewerPort
 }
 
-function onNewWebsocketConnection(socket) {
-    //join worker room
-    socket.emit('join', 'worker')
+function registerBasicHandler(socket) {
+    socket.on("connect", () => {
+        //join worker room
+        socket.emit('join', 'worker')
+        console.log("I am ready!")
+    })
 
-    //listen to worker room event
     socket.on("disconnect", () => {
         console.info(`Socket disconnected.`)
     });
+}
 
+function registerCommandHandler(socket) {
+    // socket.onAny((event, ...args) => {
+    //     console.log(`got ${event}`);
+    // });
 
-    socket.on("bot.create", (botDetails) => {
-        mineflayerBots.push({
-            instance: Bot.CreateBot(botDetails),
-            viewerPort: null
-        })
+    socket.on("worker.test", () => {
+        console.log("hello from worker")
     })
 
-    socket.on("bot.createViewer", (botName, port, cb) => {
+    socket.on("bot.create", (botDetails) => {
+        console.log("Creating bot...")
+        let bot = Bot.CreateBot(botDetails)
+        mineflayerBots.push({
+            instance: bot,
+            viewerPort: null
+        })
+        //cb(bot, botDetails.username)
+    })
+
+    socket.on("bot.createViewer", (botName, port) => {
         let viewPort = getEmptyViewerPort()
         if (port)
             viewPort = port
@@ -41,17 +55,20 @@ function onNewWebsocketConnection(socket) {
         try {
             BotViewer.CreateViewer(bot.instance, viewPort)
             bot.viewerPort = viewPort
-            cb()
         } catch (err) {
-            cb(err)
         }
-    })
+    })    
 }
 
 function CreateConnection(serverUrl) {
-    var client = new socketio(serverUrl)
-    // will fire for every new websocket connection
-    client.on("connection", onNewWebsocketConnection)
+    let socket = socketio(serverUrl, {
+        extraHeaders: {
+            "Access-Control-Allow-Origin": "*"
+        }
+    })
+
+    registerBasicHandler(socket)
+    registerCommandHandler(socket)
 }
 
 module.exports = {
