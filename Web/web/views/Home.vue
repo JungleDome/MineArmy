@@ -84,15 +84,11 @@
                         <span>{{ item.name }}</span>
                         <div class="float-right d-flex ml-auto">
                           <div>
-                            <v-icon>
-                              mdi-heart
-                            </v-icon>
+                            <v-icon> mdi-heart </v-icon>
                             <span>10</span>
                           </div>
                           <div class="ml-5">
-                            <v-icon>
-                              mdi-shield
-                            </v-icon>
+                            <v-icon> mdi-shield </v-icon>
                             <span>10</span>
                           </div>
                         </div>
@@ -103,12 +99,32 @@
               </v-card>
             </v-col>
             <v-col cols="12" md="4">
-              <v-sheet class="ma-3 pa-3" elevation="1" outlined rounded shaped>
-                <v-btn color="primary" @click="testSocket">Test Socket</v-btn>
-                <v-btn color="primary" @click="testSocket2"
-                  >Test Worker Socket</v-btn
-                >
-              </v-sheet>
+              <v-card class="ma-3 pa-3" elevation="1" outlined rounded shaped>
+                <v-card-title>Quick Access</v-card-title>
+                <v-card-text>
+                  <v-chip
+                    class="ma-2"
+                    :color="state.workerServerConnected ? 'green' : 'red'"
+                    text-color="white"
+                  >
+                    Worker Online
+                  </v-chip>
+                  <v-chip
+                    class="ma-2"
+                    :color="state.controlPanelServerConnected ? 'green' : 'red'"
+                    text-color="white"
+                  >
+                    Server Online
+                  </v-chip>
+                  <v-btn color="primary" @click="testSocket">Test Socket</v-btn>
+                  <v-btn color="primary" @click="testSocket2"
+                    >Test Worker Socket</v-btn
+                  >
+                  <v-btn color="primary" @click="updateState"
+                    >Refresh State</v-btn
+                  >
+                </v-card-text>
+              </v-card>
             </v-col>
           </v-row>
         </v-container>
@@ -129,7 +145,7 @@ export default {
   },
   data: () => ({
     botDetails: {},
-    testText: '',
+    testText: "",
     tab: null,
     valid: true,
     items: ["main"],
@@ -140,10 +156,14 @@ export default {
       // { avatarImg: "mdi-checkbox-marked-circle", name: "bot 3" },
       // { avatarImg: "mdi-checkbox-marked-circle", name: "bot 4" },
     ],
+    state: {
+      workerServerConnected: false,
+      controlPanelServerConnected: false,
+    },
   }),
   methods: {
     testSocket() {
-      this.$store.state.socket.emit("cp.test", "Hello from Vue!");
+      this.$store.state.socket.emit("controlPanel.test", "Hello from Vue!");
     },
     testSocket2() {
       this.$store.state.socket.emit("mineflayer.test", "Hello from Vue!");
@@ -159,27 +179,43 @@ export default {
           ? this.botDetails.password
           : null,
       };
-      this.$store.state.socket.emit("cp.createBot", botDetails2);
+      this.$store.state.socket.emit("controlPanel.createBot", botDetails2);
+    },
+    updateState() {
+      this.$store.state.socket.emit("controlPanel.updateState");
     },
     fillDefaultValue() {
       this.botDetails.serverPort = "25565";
       this.botDetails.serverVersion = this.serverVersions[0];
     },
-    botCreated(bot, username, err) {
-      if (err)
-        console.log(err)
+    botCreated(botDetails, err) {
+      if (err) console.log(err);
       else {
-        // this.activeBot.push({
-        //   name: username,
-        //   health: bot.health,
-        //   hunger: bot.hunger
-        // })
+        this.activeBot.push({
+          name: botDetails.username,
+          health: 0,
+          hunger: 0,
+        });
       }
+    },
+    saveServer() {
+
     }
   },
-  mounted() {
-    this.$store.commit("createSocket");
+  async mounted() {
+    await this.$store.dispatch("createSocket");
+    this.$store.state.socket.on("controlPanel.stateUpdated", (x) => {
+      this.state.workerServerConnected = x.worker.connected;
+      this.state.controlPanelServerConnected = x.controlPanel.connected;
+    });
+    this.$store.state.socket.on(
+      "controlPanel.botCreated",
+      (botDetails, err) => {
+        this.botCreated(botDetails, err);
+      }
+    );
     this.fillDefaultValue();
+    this.updateState();
   },
 };
 </script>

@@ -1,10 +1,10 @@
-const Enum = require("../enum.js")
+const Enum = require("../bot/enum.js")
 
 
 /**
  *
  *
- * @param {import("../../index.js").Bot} bot
+ * @param {import("../index.js").Bot} bot
  * @param {*} options
  */
 var Login = (bot, options) => {

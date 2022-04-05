@@ -1,10 +1,10 @@
-const MineflayerUtil = require("./mineflayer-util.js")
-const Enum = require("../enum.js")
+const PluginHelper = require("./pluginHelper.js")
+const Enum = require("../bot/enum.js")
 
 /**
  *
  *
- * @param {import("../../index.js").Bot} bot
+ * @param {import("../index.js").Bot} bot
  * @param {*} options
  */
 var AfkSeller = (bot, options) => {
@@ -54,8 +54,8 @@ var AfkSeller = (bot, options) => {
         },
         "afkSeller.stats": () => {
             var duration = new Date().getTime() - startTime.getTime()
-            bot.logger.info(`Sold ${sellCount} times in ${MineflayerUtil.getDurationDisplayString(duration)}.`, PLUGIN_DISPLAY_NAME)
-            bot.logger.info(`Average time per sold: ${MineflayerUtil.getDurationDisplayString(duration / sellCount)}.`, PLUGIN_DISPLAY_NAME)
+            bot.logger.info(`Sold ${sellCount} times in ${PluginHelper.getDurationDisplayString(duration)}.`, PLUGIN_DISPLAY_NAME)
+            bot.logger.info(`Average time per sold: ${PluginHelper.getDurationDisplayString(duration / sellCount)}.`, PLUGIN_DISPLAY_NAME)
         },
     }
 
@@ -129,7 +129,7 @@ var AfkSeller = (bot, options) => {
             bot.eventManager.registerEvent(event, func)
         }
 
-        bot.eventManager.registerEvent('core.command', async function (message, commandPlayerName) {
+        bot.eventManager.registerEvent('bot.command', async function (message, commandPlayerName) {
             try {
                 if (message == "afkSeller start") {
                     bot.eventManager.triggerEvent("afkSeller.start")

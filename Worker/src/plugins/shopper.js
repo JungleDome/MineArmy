@@ -1,9 +1,9 @@
-const Util = require("./mineflayer-util.js")
-const Enum = require("../enum.js")
+const PluginHelper = require("./pluginHelper.js")
+const Enum = require("../bot/enum.js")
 /**
  *
  *
- * @param {import("../../index.js").Bot} bot
+ * @param {import("../index.js").Bot} bot
  * @param {*} options
  */
 var Shopper = (bot, options) => {
@@ -19,7 +19,7 @@ var Shopper = (bot, options) => {
         "shopper.shopSell": async (items) => {
             try {
                 bot.currentWindow ? bot.closeWindow(bot.currentWindow) : null
-                await Util.wait(300)
+                await PluginHelper.wait(300)
                 bot.chat(COMMAND.OpenShop)
                 bot.logger.debug("Say /shop", PLUGIN_DISPLAY_NAME)
                 bot.eventManager.registerEventOnce("windowOpen", async function (window) {
@@ -65,7 +65,7 @@ var Shopper = (bot, options) => {
                             items.push({ slot: 40, clickMode: 0, clickButton: 1 })
                             bot.logger.info(items, PLUGIN_DISPLAY_NAME)
                             for (const item of items) {
-                                await Util.retryOperation(navigateNestedWindow, 3000, 3, item)
+                                await PluginHelper.retryOperation(navigateNestedWindow, 3000, 3, item)
                             }
                             bot.logger.info("Done selling", PLUGIN_DISPLAY_NAME)
                             bot.eventManager.triggerEvent("shopper.shopSellDone")
@@ -97,7 +97,7 @@ var Shopper = (bot, options) => {
             bot.eventManager.registerEvent(event, func)
         }
 
-        bot.eventManager.registerEvent('core.command', function (command) {
+        bot.eventManager.registerEvent('bot.command', function (command) {
             if (command == "shopper sell cactus") {
                 bot.eventManager.triggerEvent('shopper.shopSell', [bot.mcData.itemsByName["wheat"].id, bot.mcData.itemsByName["cactus"].id])
             } else if (command == "shopper sell nether_wart") {

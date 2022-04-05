@@ -1,6 +1,12 @@
-let registeredController = [
-    require('./mineflayerController'),
-    require('./controlPanelController')
+let state = require('../state/index')
+
+let controlPanelController = [
+    require('./controlPanel/mineflayerController'),
+    require('./controlPanel/controlPanelController')
+]
+
+let workerController = [
+    require('./worker/workerController'),
 ]
 
 let registerBaseControllerEvent = function (socketContext) {
@@ -17,15 +23,21 @@ let registerSocketEvent = function (socketContext, events) {
 
 let registerAllControllerEvent = function (socketContext) {
     registerBaseControllerEvent(socketContext)
-    registeredController.forEach(x => {
+    controlPanelController.forEach(x => {
         registerSocketEvent(socketContext, x(socketContext).events)
     })
 }
 
-let registerSubControllerEvent = function (socketContext) {
-    registeredController.forEach(x => {
-        registerSocketEvent(socketContext, x(socketContext).events)
-    })
+let registerSubControllerEvent = function (io, socketContext, type) {
+    if (type == 0) {
+        controlPanelController.forEach(x => {
+            registerSocketEvent(socketContext, x(io, socketContext, state).events)
+        })
+    } else if (type == 1) {
+        workerController.forEach(x => {
+            registerSocketEvent(socketContext, x(io, socketContext, state).events)
+        })
+    }
 }
 
 

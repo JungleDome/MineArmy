@@ -1,12 +1,12 @@
 const { Movements, goals: { GoalNear, GoalNearXZ } } = require('mineflayer-pathfinder')
 const { Vec3 } = require('vec3')
-const MineflayerUtil = require("./mineflayer-util.js")
-const Enum = require("../enum.js")
+const PluginHelper = require("./pluginHelper.js")
+const Enum = require("../bot/enum.js")
 
 /**
  *
  *
- * @param {import("../../index.js").Bot} bot
+ * @param {import("../index.js").Bot} bot
  * @param {*} options
  */
 var Farmer = (bot, options) => {
@@ -115,7 +115,7 @@ var Farmer = (bot, options) => {
                 await bot.placeBlock(blockBelow, new Vec3(0, 1, 0)).catch(async (err) => {
                     if (err.message.includes("timeout")) {
                         bot.eventManager.triggerEvent("serverHelper.ping")
-                        await MineflayerUtil.awaitEvent(bot, "serverHelper.pingDone", 10000)
+                        await PluginHelper.awaitEvent(bot, "serverHelper.pingDone", 10000)
                     }
                     else if (err.message != 'No block has been placed : the block is still air') {
                         bot.logger.warn(err.message, PLUGIN_DISPLAY_NAME)

@@ -1,10 +1,25 @@
-var socketContext;
+var io
+var socketContext
+var state
 
 let events = [
     {
-        name: 'cp.createBot',
+        name: 'controlPanel.createBot',
         fnHandler: (botDetails) => {
-            socketContext.to("worker").emit('bot.create', {
+            socketContext.to("worker").emit('worker.createBot', {
+                serverIP: botDetails.serverIP,
+                serverPort: parseInt(botDetails.serverPort),
+                serverVersion: botDetails.serverVersion,
+                username: botDetails.username,
+                password: botDetails.password,
+                offlinePassword: botDetails.offlinePassword
+            })
+        }
+    },
+    {
+        name: 'controlPanel.commandBot',
+        fnHandler: (botDetails) => {
+            socketContext.to("worker").emit('worker.command', {
                 serverIP: botDetails.serverIP,
                 serverPort: parseInt(botDetails.serverPort),
                 serverVersion: botDetails.serverVersion,
@@ -29,8 +44,10 @@ let events = [
 ]
 
 
-module.exports = (_socketContext) => {
+module.exports = (_io, _socketContext, _state) => {
+    io = _io
     socketContext = _socketContext
+    state = _state
     return {
         events: events
     }

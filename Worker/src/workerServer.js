@@ -19,6 +19,7 @@ function registerBasicHandler(socket) {
         //join worker room
         socket.emit('join', 'worker')
         console.log("I am ready!")
+        socket.emit('worker.connected')
     })
 
     socket.on("disconnect", () => {
@@ -35,17 +36,22 @@ function registerCommandHandler(socket) {
         console.log("hello from worker")
     })
 
-    socket.on("bot.create", (botDetails) => {
+    socket.on("worker.createBot", (botDetails) => {
         console.log("Creating bot...")
-        let bot = Bot.CreateBot(botDetails)
+        let err, bot
+        try {
+            bot = Bot.CreateBot(botDetails)
+        } catch (_err) {
+            error = _err
+        }
         mineflayerBots.push({
             instance: bot,
             viewerPort: null
         })
-        //cb(bot, botDetails.username)
+        socket.emit("worker.botCreated", botDetails, err)
     })
 
-    socket.on("bot.createViewer", (botName, port) => {
+    socket.on("worker.createViewer", (botName, port) => {
         let viewPort = getEmptyViewerPort()
         if (port)
             viewPort = port
@@ -58,6 +64,14 @@ function registerCommandHandler(socket) {
         } catch (err) {
         }
     })    
+
+    socket.on("worker.command", (botName, command) => {
+        let bot = getBotByName(botName)
+
+        bot.emit("bot.serverCommand", command)
+
+        socket.emit("worker.commandReceived", botName, command)
+    })
 }
 
 function CreateConnection(serverUrl) {

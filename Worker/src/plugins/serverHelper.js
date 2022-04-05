@@ -1,12 +1,12 @@
-const Util = require("./mineflayer-util.js")
+const PluginHelper = require("./pluginHelper.js")
 const { Movements, goals: { GoalNear, GoalNearXZ } } = require('mineflayer-pathfinder')
 const Vec3 = require("Vec3")
-const Enum = require("../enum.js")
+const Enum = require("../bot/enum.js")
 
 /**
  *
  *
- * @param {import("../../index.js").Bot} bot
+ * @param {import("../index.js").Bot} bot
  * @param {*} options
  */
 var ServerHelper = (bot, options) => {
@@ -29,11 +29,11 @@ var ServerHelper = (bot, options) => {
         },
         "serverHelper.walkAround": async () => {
             bot.setControlState("forward", true)
-            await Util.wait("1000")
+            await PluginHelper.wait("1000")
             bot.setControlState("forward", false)
-            await Util.wait("300")
+            await PluginHelper.wait("300")
             bot.setControlState("back", true)
-            await Util.wait("1000")
+            await PluginHelper.wait("1000")
             bot.setControlState("back", false)
             bot.eventManager.triggerEvent("serverHelper.walkAroundDone")
         },
@@ -55,7 +55,7 @@ var ServerHelper = (bot, options) => {
             bot.eventManager.registerEvent(event, func)
         }
 
-        bot.eventManager.registerEvent('core.command', function (command, commandName) {
+        bot.eventManager.registerEvent('bot.command', function (command, commandName) {
             if (command == 'helper ping') {
                 bot.eventManager.triggerEvent("serverHelper.ping")
                 bot.eventManager.registerEventOnce("serverHelper.pingDone", () => {

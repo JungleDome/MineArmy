@@ -39,9 +39,8 @@ export default {
   data: () => ({
     drawer: false,
   }),
-  mounted() {
-    console.log("mount - socket");
-    this.$store.commit("createSocket");
+  async mounted() {
+    this.$store.dispatch("createSocket");
   },
 };
 </script>

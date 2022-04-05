@@ -44,9 +44,10 @@ server.listen(PORT, null, () => {
     let socket = io.sockets.sockets.get(id);
     if (room == 'controlPanel') {
       console.log('An admin connected');
-      baseController.registerSubControllerEvent(socket)
+      baseController.registerSubControllerEvent(io, socket, 0)
     } else if (room == 'worker') {
       console.log('A worker connected');
+      baseController.registerSubControllerEvent(io, socket, 1)
     }
   })
 });

@@ -1,10 +1,10 @@
-const Util = require("./mineflayer-util.js")
-const Enum = require("../enum.js")
+const PluginHelper = require("./pluginHelper.js")
+const Enum = require("../bot/enum.js")
 
 /**
  *
  *
- * @param {import("../../index.js").Bot} bot
+ * @param {import("../index.js").Bot} bot
  */
 var Essential = (bot) => {
 
@@ -29,25 +29,24 @@ var Essential = (bot) => {
 
         //Listen for player message
         bot.eventManager.registerEvent('message', (message) => {
-            if (message && Util.stripTextFormat(message.toString())) {
-                var strippedMessage = Util.stripTextFormat(message.toString())
+            if (message && PluginHelper.stripTextFormat(message.toString())) {
+                var strippedMessage = PluginHelper.stripTextFormat(message.toString())
                 bot.logger.info(strippedMessage)
-                bot.eventManager.triggerEvent('core.strippedMessage', strippedMessage)
+                bot.eventManager.triggerEvent('bot.strippedMessage', strippedMessage)
             }
         })
 
-        bot.eventManager.registerEvent('core.command', (message) => {
-            if (message == "quit") {
-                bot.eventManager.triggerEvent("essential.quit")
-            } else if (message.startsWith("say ")) {
-                bot.chat(message.replace("say ", ""))
-            }
+        bot.commandManager.registerCommand(['quit'], x => {
+            bot.eventManager.triggerEvent("essential.quit")
+        })
+        bot.commandManager.registerCommand(['say'], x => {
+            bot.chat(x)
         })
 
         //Listen for mineflayer event
         bot.eventManager.registerEvent('error', (err) => {
             bot.logger.error(err, PLUGIN_DISPLAY_NAME)
-            bot.eventManager.triggerEvent("core.rejoin")
+            bot.eventManager.triggerEvent("bot.rejoin")
         })
 
         bot.eventManager.registerEvent('login', () => {
@@ -61,7 +60,7 @@ var Essential = (bot) => {
         bot.eventManager.registerEvent('kicked', (reason) => {
             bot.logger.info(`Kicked - ${reason}`, PLUGIN_DISPLAY_NAME)
             if (reason.text == "[Proxy] Proxy restarting.")
-                bot.eventManager.triggerEvent("core.rejoin")
+                bot.eventManager.triggerEvent("bot.rejoin")
         })
     }
 

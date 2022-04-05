@@ -9,7 +9,7 @@ const store = createStore({
     }
   },
   mutations: {
-    createSocket(state) {
+    createSocket(state, successCallback) {
       if (!state.socket) {
         state.socket = socketio('http://localhost:8080/', {
           extraHeaders: {
@@ -18,8 +18,20 @@ const store = createStore({
         })
         state.socket.on('connect', () => {
           state.socket.emit('join', 'controlPanel')
+          successCallback()
         })
+      } else {
+        successCallback()
       }
+    }
+  },
+  actions: {
+    createSocket(context) {
+      return new Promise((resolve, reject) => {
+        context.commit('createSocket', () => {
+          resolve()
+        })
+      })
     }
   }
 })
