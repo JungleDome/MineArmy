@@ -1,4 +1,5 @@
-let state = require('../state/index')
+let State = require('../state/index')
+let EventManager = require('../eventManager')
 
 let controlPanelController = [
     require('./controlPanel/mineflayerController'),
@@ -21,28 +22,17 @@ let registerSocketEvent = function (socketContext, events) {
     })
 }
 
-let registerAllControllerEvent = function (socketContext) {
-    registerBaseControllerEvent(socketContext)
-    controlPanelController.forEach(x => {
-        registerSocketEvent(socketContext, x(socketContext).events)
-    })
-}
-
 let registerSubControllerEvent = function (io, socketContext, type) {
-    if (type == 0) {
-        controlPanelController.forEach(x => {
-            registerSocketEvent(socketContext, x(io, socketContext, state).events)
-        })
-    } else if (type == 1) {
-        workerController.forEach(x => {
-            registerSocketEvent(socketContext, x(io, socketContext, state).events)
-        })
-    }
+    let eventManager = EventManager(io, socketContext)
+    let registeringController = type == 0 ? controlPanelController : type == 1 ? workerController : []
+
+    registeringController.forEach(x => {
+        registerSocketEvent(socketContext, x({ eventManager: eventManager, state: State }).events)
+    })
 }
 
 
 module.exports = {
-    registerAllControllerEvent: registerAllControllerEvent,
     registerSocketEvent: registerSocketEvent,
     registerBaseControllerEvent: registerBaseControllerEvent,
     registerSubControllerEvent: registerSubControllerEvent,

@@ -38,7 +38,7 @@ module.exports = {
     /**
      *
      *
-     * @param {import('..').Bot} bot
+     * @param {import('../..').Bot} bot
      * @param {string} eventName
      * @param {number} [timeout=3000]
      * @returns Event promise

@@ -59,6 +59,14 @@
                       density="compact"
                       color="primary"
                     ></v-checkbox>
+                    <v-checkbox
+                      inset
+                      v-model="botDetails.remember"
+                      label="Remember this bot"
+                      hide-details="auto"
+                      density="compact"
+                      color="primary"
+                    ></v-checkbox>
                   </v-form>
                 </v-card-text>
                 <v-card-actions class="float-right">
@@ -76,6 +84,7 @@
                       :key="i"
                       :value="item"
                       active-color="primary"
+                      :color="'success' ? item.state == 1 : 'error' ? item.state == 2 : 'grey'"
                       rounded
                       class="w-100 my-1"
                       border="1px solid grey"
@@ -179,41 +188,53 @@ export default {
           ? this.botDetails.password
           : null,
       };
+      if (this.botDetails.remember) this.saveServer();
       this.$store.state.socket.emit("controlPanel.createBot", botDetails2);
     },
     updateState() {
       this.$store.state.socket.emit("controlPanel.updateState");
     },
     fillDefaultValue() {
-      this.botDetails.serverPort = "25565";
-      this.botDetails.serverVersion = this.serverVersions[0];
-    },
-    botCreated(botDetails, err) {
-      if (err) console.log(err);
+      if (this.getServer() != null)
+       this.botDetails = this.getServer();
       else {
+        this.botDetails.serverPort = "25565";
+        this.botDetails.serverVersion = this.serverVersions[0];
+      }
+    },
+    saveServer() {
+      localStorage.setItem("serverDetails", JSON.stringify(this.botDetails));
+    },
+    getServer() {
+      return JSON.parse(localStorage.getItem("serverDetails"));
+    },
+    registerEvents() {
+      this.$store.state.socket.on("controlPanel.botCreated", (botDetails, err) => {
         this.activeBot.push({
           name: botDetails.username,
           health: 0,
           hunger: 0,
         });
-      }
+      });
+      this.$store.state.socket.on("controlPanel.botError", (bot, err) => {
+        let errorBot = this.activeBot.find(x => x.uuid == bot.details.uuid)
+        if (errorBot)
+          this.$set(errorBot, 'state', bot.state)
+      });
+      this.$store.state.socket.on("controlPanel.botDisconnected", (bot, botList) => {
+        let disconnectedBot = this.activeBot.find(x => x.uuid == bot.details.uuid)
+        if (disconnectedBot)
+          this.$set(disconnectedBot, 'state', bot.state)
+      });
+      this.$store.state.socket.on("controlPanel.stateUpdated", (x) => {
+        this.state.workerServerConnected = x.worker.connected;
+        this.state.controlPanelServerConnected = x.controlPanel.connected;
+      });
     },
-    saveServer() {
-
-    }
   },
   async mounted() {
     await this.$store.dispatch("createSocket");
-    this.$store.state.socket.on("controlPanel.stateUpdated", (x) => {
-      this.state.workerServerConnected = x.worker.connected;
-      this.state.controlPanelServerConnected = x.controlPanel.connected;
-    });
-    this.$store.state.socket.on(
-      "controlPanel.botCreated",
-      (botDetails, err) => {
-        this.botCreated(botDetails, err);
-      }
-    );
+    this.registerEvents();
     this.fillDefaultValue();
     this.updateState();
   },

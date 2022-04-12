@@ -1,12 +1,12 @@
 const { Movements, goals: { GoalNear, GoalNearXZ } } = require('mineflayer-pathfinder')
 const { Vec3 } = require('vec3')
-const PluginHelper = require("./pluginHelper.js")
-const Enum = require("../bot/enum.js")
+const PluginHelper = require("../helper/pluginHelper.js")
+const Enum = require("../lib/enum.js")
 
 /**
  *
  *
- * @param {import("../index.js").Bot} bot
+ * @param {import("../../index.js").Bot} bot
  * @param {*} options
  */
 var Farmer = (bot, options) => {

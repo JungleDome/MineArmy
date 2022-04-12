@@ -4,7 +4,7 @@ Deployable minecraft bot cluster. Featuring event based control & dynamic bot ex
 ## Features
 - Vue based control panel
 - Event based communication between control panel & bot cluster
-- Reloadable bot plugins (*No more spamming join message in your  server*)
+- Hot reload bot plugins (*No more spamming join message in your server*)
 - Spawn as many bot you like
 - Control your bot cluster from browser
 
@@ -80,4 +80,25 @@ All event will follow the party naming as it's prefix.
 | Worker        | `worker`       |
 
 *Note: Core does not have any events as it will be consuming events from Control Panel & Worker.
+
+### Worker
+#### Plugins
+Plugins is where you place all the logic. It is seperated into two general events.
+
+Command events are events that react to commands from player or control panel. You will first need to register a command using `bot.commandManager.registerCommand` or simply listen to any events the bot emits.
+
+Logic events are events that the plugin used for handling logic. You may chain multiple logic event to complete an action.
+
+This should generally be how the plugin works:
+
+Input from control panel -> Command events -> Logic events -> Logic events -> Output/Done
+
+#### Logger (`bot.logger`)
+Works the same as `console.log` with more output details and log history.
+
+#### Event Manager (`bot.eventManager`)
+All worker plugins **must** listen/emit events through event manager to support hot reloading plugins
+
+#### Plugin Manager (`bot.commandManager`)
+Handles registration of worker plugin events, worker plugin commands & receiving command from control panel
 

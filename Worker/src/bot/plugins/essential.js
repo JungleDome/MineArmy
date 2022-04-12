@@ -1,10 +1,10 @@
-const PluginHelper = require("./pluginHelper.js")
-const Enum = require("../bot/enum.js")
+const PluginHelper = require("../helper/pluginHelper.js")
+const Enum = require("../lib/enum.js")
 
 /**
  *
  *
- * @param {import("../index.js").Bot} bot
+ * @param {import("../../index.js").Bot} bot
  */
 var Essential = (bot) => {
 
@@ -18,7 +18,6 @@ var Essential = (bot) => {
             bot.logger.info("Received quit command, goodbye.",)
             bot.logger.info("Exiting...")
             bot.quit()
-            process.exit()
         }
     }
 
@@ -46,10 +45,11 @@ var Essential = (bot) => {
         //Listen for mineflayer event
         bot.eventManager.registerEvent('error', (err) => {
             bot.logger.error(err, PLUGIN_DISPLAY_NAME)
+            bot.eventManager.triggerEvent('bot.error', err)
             bot.eventManager.triggerEvent("bot.rejoin")
         })
 
-        bot.eventManager.registerEvent('login', () => {
+        bot.eventManager.registerEvent('spawn', () => {
             bot.logger.info("Joined game", PLUGIN_DISPLAY_NAME)
         })
 

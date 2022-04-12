@@ -7,7 +7,7 @@ const { readdir } = require('fs').promises;
 /**
  *
  *
- * @param {import("../index.js").Bot} bot
+ * @param {import("../../index.js").Bot} bot
  */
 var PluginManager = (bot) => {
     //Plugin information
@@ -72,26 +72,32 @@ var PluginManager = (bot) => {
     }
 
     let commands = {}
+    /**
+     * Register plugin's listening command
+     * @param commandPath {Array} Navigation of command path. Example: plugin command1 = ["plugin", "command1"]
+     * @param callback {Function} Callback when the command is called.
+     */
     function registerCommand(commandPath, callback) {
         if (!Array.isArray(commandPath))
             bot.logger.error(`Unable to register command '${commandPath}'. Argument must be array.`, PLUGIN_DISPLAY_NAME)
         
         let traversalCommands = commands
-        commandPath.forEach((x,i) => {
+        for (const [i, x] of commandPath.entries()) {
             if (traversalCommands[x] && (i == commandPath.length - 1 || typeof (traversalCommands[x]) === 'function') ) {
                 bot.logger.error(`Unable to register command '${commandPath}'. Command already registered.`, PLUGIN_DISPLAY_NAME)
-                return false;
+                break
             } else if (traversalCommands[x]) {
                 traversalCommands = traversalCommands[x]
             } else if (!traversalCommands[x]) {
-                if (i == commandPath.length - 1)
-                    traversalCommands[x] = callback(commandPath.slice(i))
+                if (i == commandPath.length - 1) {
+                    traversalCommands[x] = callback
+                }
                 else {
                     traversalCommands[x] = {}
                     traversalCommands = traversalCommands[x]
                 }
             }  
-        })
+        }
     }
 
     function runCommand(message) {
@@ -99,18 +105,25 @@ var PluginManager = (bot) => {
         let args = message.match(commandRegex)
 
         let traversalCommand = commands
-        args.forEach((x, i) => {
-            if (traversalCommand[x] && typeof (traversalCommand[x]) === 'function')
-                traversalCommand[x]()
+        for (const [i, x] of args.entries()) {
+            if (traversalCommand[x] && typeof (traversalCommand[x]) === 'function') {
+                traversalCommand[x](args.slice(i + 1))
+                break
+            }
             else if (traversalCommand[x])
                 traversalCommand = traversalCommand[x]
             else
                 bot.logger.error(`Unknown command.`, PLUGIN_DISPLAY_NAME)
-        })
+        }
     }
 
-    registerEvent()
-    loadPlugins()
+    try {
+        registerEvent()
+        loadPlugins()
+    } catch (err) {
+        bot.emit('bot.error', err);
+    }
+
     bot.logger.info("Loaded", PLUGIN_DISPLAY_NAME)
 
     //Expose plugin information

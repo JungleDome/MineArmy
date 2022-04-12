@@ -1,10 +1,9 @@
 const Mineflayer = require('mineflayer');
-const Config = require('../utilities/config.js');
 const { pathfinder } = require('mineflayer-pathfinder');
-const EventManager = require('../utilities/eventManager.js');
-const Logger = require('../utilities/logger.js');
-const PluginManager = require('./pluginManager.js');
-const Enum = require('./enum.js')
+const EventManager = require('./lib/eventManager.js');
+const Logger = require('./lib/logger.js');
+const PluginManager = require('./lib/pluginManager.js');
+const Enum = require('./lib/enum.js')
 require("format-unicorn");
 
 let botInstances = [];
@@ -31,6 +30,7 @@ const CreateBot = function (botDetails, mineflayerClient) {
 
     bot.core = {
         config: {
+            uuid: botDetails.uuid,
             username: botDetails.username,
             offlinePassword: botDetails.offlinePassword,
             masterPlayerName: ''
@@ -42,7 +42,7 @@ const CreateBot = function (botDetails, mineflayerClient) {
     //Inject utilities class
     bot.eventManager = EventManager(bot);
     bot.logger = Logger(bot);
-    bot.pluginManager = {
+    bot.commandManager = {
         registerCommand: PluginManager(bot).registerCommand
     }
     

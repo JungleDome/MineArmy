@@ -1,7 +1,7 @@
 import { Bot as MineflayerBot } from "mineflayer";
 import SimpleLogger from "simple-node-logger";
 import MinecraftData from "minecraft-data";
-import { PLUGIN_PRIORITY } from "./bot/enum.js"
+import { PLUGIN_PRIORITY } from "./bot/lib/enum.js"
 
 export default function (bot: Bot, options: any): void;
 

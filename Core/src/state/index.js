@@ -1,5 +1,6 @@
 let workerState = {
-    connected: false
+    connected: false,
+    online: []
 }
 
 let controlPanelState = {

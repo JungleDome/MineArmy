@@ -1,6 +1,6 @@
-const WorkerServer = require('./workerServer.js');
+const WorkerServer = require('./server/workerServer.js');
 const Process = require('process');
-const Config = require('./utilities/config.js')
+const Config = require('./config.json')
 const Bot = require('./bot/bot');
 
 //// For minecraft client proxy
