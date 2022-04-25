@@ -33,9 +33,11 @@ module.exports = ({ eventManager, state } = {}) => {
                 console.log('test event')
             }
         }, {
-            name: 'mineflayer.test',
+            name: 'controlPanel.test',
             fnHandler: () => {
-                console.log("Sending command to worker")
+                console.log("Control panel test command received.")
+                eventManager.emitToControlPanel('controlPanel.testReceived', state)
+                console.log("Sending test command to worker.")
                 eventManager.emitToWorker('worker.test')
             }
         }

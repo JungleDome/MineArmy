@@ -1,13 +1,10 @@
+/**
+ * @param {EventManager} eventManager
+ * @param {State} state
+ */
 module.exports = ({ eventManager, state } = {}) => {
     let history = []
     let events = [
-        {
-            name: 'controlPanel.test',
-            fnHandler: (message) => {
-                //Save history
-                console.log(message)
-            }
-        },
         {
             name: 'controlPanel.updateState',
             fnHandler: () => {

@@ -19,6 +19,7 @@ module.exports = ({ socket } = {}) => {
             name: 'worker.test',
             fnHandler: () => {
                 console.log("hello from worker")
+                socket.emit("worker.testReceived")
             }
         },
         {

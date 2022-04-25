@@ -38,9 +38,9 @@ module.exports = ({ eventManager, state } = {}) => {
             }
         },
         {
-            name: 'worker.test',
+            name: 'worker.testReceived',
             fnHandler: () => {
-                console.log('Worker replied test.')
+                console.log('Worker test command received.')
             }
         },
         {

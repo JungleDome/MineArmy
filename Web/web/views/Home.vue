@@ -126,9 +126,6 @@
                     Server Online
                   </v-chip>
                   <v-btn color="primary" @click="testSocket">Test Socket</v-btn>
-                  <v-btn color="primary" @click="testSocket2"
-                    >Test Worker Socket</v-btn
-                  >
                   <v-btn color="primary" @click="updateState"
                     >Refresh State</v-btn
                   >
@@ -173,9 +170,6 @@ export default {
   methods: {
     testSocket() {
       this.$store.state.socket.emit("controlPanel.test", "Hello from Vue!");
-    },
-    testSocket2() {
-      this.$store.state.socket.emit("mineflayer.test", "Hello from Vue!");
     },
     deployBot() {
       let botDetails2 = {
