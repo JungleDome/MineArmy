@@ -7,8 +7,8 @@ const Enum = require("./enum.js")
  */
 var CommandManager = (bot) => {
     //Plugin information
-    const PLUGIN_DISPLAY_NAME = "Plugin Manager"
-    const PLUGIN_NAME = "pluginManager"
+    const PLUGIN_DISPLAY_NAME = "Command Manager"
+    const PLUGIN_NAME = "commandManager"
     const PLUGIN_PRIORITY = Enum.PLUGIN_PRIORITY.CRITICAL
 
     let commands = {}
@@ -59,12 +59,6 @@ var CommandManager = (bot) => {
         }
     }
 
-    try {
-        registerEvent()
-    } catch (err) {
-        bot.emit('bot.error', err);
-    }
-
     bot.logger.info("Loaded", PLUGIN_DISPLAY_NAME)
 
     //Expose plugin information
@@ -72,7 +66,8 @@ var CommandManager = (bot) => {
         name: PLUGIN_NAME,
         displayName: PLUGIN_DISPLAY_NAME,
         priority: PLUGIN_PRIORITY,
-        registerCommand: registerCommand
+        registerCommand: registerCommand,
+        runCommand: runCommand
     }
 }
 

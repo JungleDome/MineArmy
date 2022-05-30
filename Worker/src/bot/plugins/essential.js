@@ -41,6 +41,10 @@ var Essential = (bot) => {
         bot.commandManager.registerCommand(['say'], x => {
             bot.chat(x)
         })
+        bot.commandManager.registerCommand(['reload'], async x => {
+            await bot.pluginManager.load()
+            bot.logger.info("Plugins reloaded.", PLUGIN_DISPLAY_NAME)
+        })
 
         //Listen for mineflayer event
         bot.eventManager.registerEvent('error', (err) => {
@@ -61,6 +65,15 @@ var Essential = (bot) => {
             bot.logger.info(`Kicked - ${reason}`, PLUGIN_DISPLAY_NAME)
             if (reason.text == "[Proxy] Proxy restarting.")
                 bot.eventManager.triggerEvent("bot.rejoin")
+        })
+
+        //TODO:refactor event registering below
+        bot.on('bot.serverCommand', function (message) {
+            if (message && Util.stripTextFormat(message.toString())) {
+                var serverCommand = Util.stripTextFormat(message.toString())
+                bot.logger.info(serverCommand, PLUGIN_DISPLAY_NAME)
+                //bot.emit('bot.command', serverCommand, bot.bot.config.masterPlayerName)
+            }
         })
     }
 
