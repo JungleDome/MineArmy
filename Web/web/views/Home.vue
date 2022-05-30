@@ -135,29 +135,31 @@
           </v-row>
         </v-container>
       </v-window-item>
-      <v-window-item>
-        <p>Hello!</p>
+      <v-window-item value="bot 1">
+        <worker-view/>
       </v-window-item>
     </v-window>
   </div>
 </template>
 
 <script>
-import VueTextField from "../components/VueTextField.vue";
+import VueTextField from "../components/elements/inputs/VueTextField.vue";
+import WorkerView from "../components/elements/pageElements/workerView.vue";
 
 export default {
   components: {
     "vue-text-field": VueTextField,
+    "worker-view": WorkerView,
   },
   data: () => ({
     botDetails: {},
     testText: "",
     tab: null,
     valid: true,
-    items: ["main"],
-    serverVersions: ["1.18.2", "1.18", "1.17"],
+    items: ["main","bot 1", "bot 2"],
+    serverVersions: ["1.18.2", "1.18.1", "1.18", "1.17.1", "1.17"],
     activeBot: [
-      // { avatarImg: "mdi-shield-outline", name: "bot 1" },
+      { avatarImg: "mdi-shield-outline", name: "bot 1" },
       // { avatarImg: "mdi-checkbox-marked-circle", name: "bot 2" },
       // { avatarImg: "mdi-checkbox-marked-circle", name: "bot 3" },
       // { avatarImg: "mdi-checkbox-marked-circle", name: "bot 4" },
@@ -209,6 +211,7 @@ export default {
           health: 0,
           hunger: 0,
         });
+        this.items.push(botDetails.username)
       });
       this.$store.state.socket.on("controlPanel.botError", (bot, err) => {
         let errorBot = this.activeBot.find(x => x.uuid == bot.details.uuid)
